@@ -10,7 +10,7 @@ yarn add slack-blockx
 
 ## Usage
 
-```js
+```jsx
 /** @jsx createBlock */
 import { createBlock } from 'slack-blockx';
 
@@ -43,7 +43,7 @@ console.log(
 
 ## Usage without compiler
 
-```js
+```jsx
 const { jsx } = require('slack-blockx');
 
 console.log(jsx`

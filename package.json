@@ -18,6 +18,7 @@
   "devDependencies": {
     "@slack/types": "^1.5.0",
     "@types/jest": "^25.1.4",
+    "@types/node": "^13.9.5",
     "jest": "^25.2.3",
     "jest-snapshot": "^25.2.3",
     "prettier": "2.0.2",
@@ -29,6 +30,7 @@
     "trailingComma": "es5"
   },
   "dependencies": {
+    "colorette": "^1.1.0",
     "htm": "^3.0.3"
   }
 }

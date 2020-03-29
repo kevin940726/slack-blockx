@@ -16,7 +16,12 @@ export function isNullish(value: unknown): boolean {
   return value == null || value === false;
 }
 
-export function flattenChildren(children: JSX.Element[]): JSX.Element[] {
+export function flattenChildren(
+  children: JSX.Element[]
+): {
+  type: string;
+  [key: string]: any;
+}[] {
   const flattened = children.flat(Infinity);
 
   const filtered = flattened.filter((child) => !isNullish(child));
@@ -39,4 +44,15 @@ export function flattenChildren(children: JSX.Element[]): JSX.Element[] {
   }
 
   return filtered;
+}
+
+export function createCleanError(errorMessage?: string) {
+  const error = new Error(errorMessage);
+
+  error.stack = error
+    .stack!.split('\n')
+    .filter((stack) => !/\/slack-blockx\/(src|dist)\//.test(stack))
+    .join('\n');
+
+  return error;
 }

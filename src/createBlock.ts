@@ -1,6 +1,7 @@
 import { PlainTextElement } from '@slack/types';
 import * as predefinedComponents from './components';
-import { stringToPlainText, flattenChildren } from './utils';
+import { stringToPlainText, flattenChildren, createCleanError } from './utils';
+import { validateParent } from './validators';
 
 function createBlock(
   type: string | Function,
@@ -48,6 +49,10 @@ function createBlock(
     }
   });
 
+  for (const child of flattenedChildren) {
+    validateParent(type, child);
+  }
+
   const block =
     typeof type === 'function'
       ? type({
@@ -64,6 +69,15 @@ function createBlock(
       delete block[prop];
     }
   });
+
+  // Assign source file path to block for prettier error logging
+  if (typeof block === 'object' && !Array.isArray(block)) {
+    Object.defineProperty(block, Symbol.for('__source'), {
+      value: createCleanError().stack!.split('\n')[1],
+      configurable: true,
+      enumerable: false,
+    });
+  }
 
   return block;
 }

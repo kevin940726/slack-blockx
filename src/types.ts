@@ -39,8 +39,40 @@ export type IntrinsicChildren<P, K extends keyof P> = Omit<Intrinsic<P>, K> & {
   children?: P[K] | Children;
 };
 
-export type Child = Object | string | number | null | false | undefined;
+export type Child =
+  | { [key: string]: any }
+  | string
+  | number
+  | null
+  | false
+  | undefined;
 export type Children = Child | Child[];
+
+export const MESSAGE_LAYOUT_BLOCKS = new Set([
+  'actions',
+  'context',
+  'divider',
+  'file',
+  'image',
+  'section',
+]);
+
+export const MODAL_LAYOUT_BLOCKS = new Set([
+  'actions',
+  'context',
+  'divider',
+  'image',
+  'section',
+]);
+
+export const HOME_LAYOUT_BLOCKS = new Set([
+  'actions',
+  'context',
+  'divider',
+  'image',
+  'input',
+  'section',
+]);
 
 declare global {
   namespace JSX {

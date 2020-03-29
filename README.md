@@ -41,6 +41,8 @@ console.log(
 // }
 ```
 
+[View it on Block Kit Builder](https://api.slack.com/tools/block-kit-builder?mode=message&blocks=%5B%7B%22type%22%3A%22actions%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22emoji%22%3Atrue%2C%22text%22%3A%22Button%22%7D%7D%5D%7D%5D)
+
 ## Usage without compiler
 
 ```jsx
@@ -54,6 +56,8 @@ console.log(jsx`
   </blocks>
 `); // Same as above
 ```
+
+[View it on Block Kit Builder](https://api.slack.com/tools/block-kit-builder?mode=message&blocks=%5B%7B%22type%22%3A%22actions%22%2C%22elements%22%3A%5B%7B%22type%22%3A%22button%22%2C%22text%22%3A%7B%22type%22%3A%22plain_text%22%2C%22emoji%22%3Atrue%2C%22text%22%3A%22Button%22%7D%7D%5D%7D%5D)
 
 ## Documentation
 

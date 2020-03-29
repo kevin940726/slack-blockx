@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "jsx for Slack block-kit",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": "https://github.com/kevin940726/slack-blockx",
   "author": "Kai Hao",
   "license": "MIT",

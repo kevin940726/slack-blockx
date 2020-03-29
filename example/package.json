@@ -7,6 +7,9 @@
     "start": "parcel index.html --open",
     "build": "parcel build index.html"
   },
+  "dependencies": {
+    "slack-blockx": "latest"
+  },
   "devDependencies": {
     "parcel-bundler": "^1.6.1"
   },

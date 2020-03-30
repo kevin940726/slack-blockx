@@ -10,7 +10,7 @@ import {
 export function throwIfInvalidParentError(
   parentType: string,
   expected: readonly string[],
-  child: { type: string; [key: string]: any }
+  child: { type: string; [key: string]: unknown }
 ) {
   if (!expected.includes(child.type)) {
     const joined = `${expected.map((type) => green(`<${type}>`)).join(', ')}`;
@@ -48,7 +48,7 @@ Expected one of ${joined}, but instead received ${childLabel}.
 
 export function validateParent(
   parentType: string | Function,
-  child: { type: string; [key: string]: any }
+  child: { type: string; [key: string]: unknown }
 ) {
   switch (parentType) {
     case predefinedComponents.blocks: {

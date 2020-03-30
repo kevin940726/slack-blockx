@@ -20,7 +20,7 @@ export function flattenChildren(
   children: JSX.Element[]
 ): {
   type: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }[] {
   const flattened = children.flat(Infinity);
 

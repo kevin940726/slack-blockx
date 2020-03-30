@@ -2,41 +2,51 @@ import { PlainTextElement } from '@slack/types';
 import * as predefinedComponents from './components';
 import { stringToPlainText, flattenChildren, createCleanError } from './utils';
 import { validateParent } from './validators';
+import { Component } from './types';
 
-function createBlock(
-  type: string | Function,
-  props: { [key: string]: unknown },
+function createBlock<P extends { [key: string]: unknown }>(
+  type:
+    | string
+    | Component<P>
+    | typeof predefinedComponents[keyof typeof predefinedComponents],
+  inputProps: P,
   ...children: JSX.Element[]
 ): JSX.Element | JSX.Element[] {
   const flattenedChildren = flattenChildren(children);
 
   if (type in predefinedComponents) {
-    const Component =
+    const PredefinedComponent =
       predefinedComponents[type as keyof typeof predefinedComponents];
-    return createBlock(Component, props, ...flattenedChildren);
+    return createBlock(PredefinedComponent, inputProps, ...flattenedChildren);
   } else if (type === '' || type === 'fragment') {
     return flattenedChildren;
   }
 
-  props = props || {};
+  const props: P & {
+    text?: string | PlainTextElement;
+    placeholder?: string | number | PlainTextElement;
+    label?: string | number | PlainTextElement;
+  } = inputProps || {};
 
   if (typeof type === 'string') {
     if (
       flattenedChildren.length === 1 &&
       flattenedChildren.every((child) => child.type === 'plain_text')
     ) {
-      const text = flattenedChildren.map((child) => child.text).join('');
+      let text: string | PlainTextElement = flattenedChildren
+        .map((child) => child.text)
+        .join('');
 
-      if (['mrkdwn', 'markdown', 'plain_text'].includes(type)) {
-        props.text = text;
-      } else {
-        props.text = stringToPlainText(text);
+      if (!['mrkdwn', 'markdown', 'plain_text'].includes(type)) {
+        text = stringToPlainText(text);
       }
+
+      props.text = text;
     }
   }
 
   // Common prop name for plain_text field
-  ['placeholder', 'label'].forEach((textProp) => {
+  (['placeholder', 'label'] as const).forEach((textProp) => {
     if (textProp in props) {
       props[textProp] = stringToPlainText(
         props[textProp] as PlainTextElement | string | number
@@ -50,7 +60,7 @@ function createBlock(
 
   const block =
     typeof type === 'function'
-      ? type({
+      ? (type as Component<P>)({
           ...props,
           children: flattenedChildren,
         })
@@ -59,12 +69,13 @@ function createBlock(
           ...props,
         };
 
-  // Remove any nullish prop (undefined or null)
-  Object.keys(block).forEach((prop) => {
-    if (block[prop] == null) {
-      delete block[prop];
+  if (typeof block === 'object' && !Array.isArray(block)) {
+    for (const prop in block) {
+      if (block[prop] == null) {
+        delete block[prop];
+      }
     }
-  });
+  }
 
   // Assign source file path to block for prettier error logging
   if (typeof block === 'object' && !Array.isArray(block)) {

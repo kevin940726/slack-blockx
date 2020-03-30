@@ -42,6 +42,8 @@ export type NonBlockChild = string | number | null | false | undefined;
 export type Child = { [key: string]: unknown } | NonBlockChild;
 export type Children = Child | Child[];
 
+export type Component<P extends {}> = (props: P) => JSX.Element | JSX.Element[];
+
 export const MESSAGE_LAYOUT_BLOCKS = [
   'actions',
   'context',
@@ -73,7 +75,7 @@ declare global {
     export type Element = Child;
     export interface IntrinsicElements {
       blocks: {
-        [key: string]: any;
+        [key: string]: unknown;
       };
       dialog: IntrinsicChildren<Dialog, 'elements'>;
       modal:

@@ -13,7 +13,7 @@ function createBlock(
   if (type in predefinedComponents) {
     const Component =
       predefinedComponents[type as keyof typeof predefinedComponents];
-    return createBlock(Component, props, ...children);
+    return createBlock(Component, props, ...flattenedChildren);
   } else if (type === '' || type === 'fragment') {
     return flattenedChildren;
   }
@@ -22,25 +22,20 @@ function createBlock(
 
   if (typeof type === 'string') {
     if (
-      children.length &&
-      children.every((child) => typeof child !== 'object')
+      flattenedChildren.length === 1 &&
+      flattenedChildren.every((child) => child.type === 'plain_text')
     ) {
-      const text = children.join('');
+      const text = flattenedChildren.map((child) => child.text).join('');
 
-      if (['mrkdwn', 'plain_text'].includes(type)) {
+      if (['mrkdwn', 'markdown', 'plain_text'].includes(type)) {
         props.text = text;
       } else {
-        props.text = {
-          type: 'plain_text',
-          emoji: true,
-          text,
-        };
+        props.text = stringToPlainText(text);
       }
-    } else {
-      props.text = children[0];
     }
   }
 
+  // Common prop name for plain_text field
   ['placeholder', 'label'].forEach((textProp) => {
     if (textProp in props) {
       props[textProp] = stringToPlainText(
@@ -64,6 +59,7 @@ function createBlock(
           ...props,
         };
 
+  // Remove any nullish prop (undefined or null)
   Object.keys(block).forEach((prop) => {
     if (block[prop] == null) {
       delete block[prop];

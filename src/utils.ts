@@ -27,15 +27,23 @@ export function flattenChildren(
   const filtered = flattened.filter((child) => !isNullish(child));
 
   for (let i = 0; i < filtered.length; i += 1) {
-    if (typeof filtered[i] !== 'object') {
-      let joinArr = [filtered[i]];
+    if (typeof filtered[i] !== 'object' || filtered[i].type === 'plain_text') {
+      let joinArr = [
+        typeof filtered[i].text === 'string' ? filtered[i].text : filtered[i],
+      ];
 
       for (
         let joinEnd = i + 1;
-        joinEnd < filtered.length && typeof filtered[joinEnd] !== 'object';
+        joinEnd < filtered.length &&
+        (typeof filtered[joinEnd] !== 'object' ||
+          filtered[joinEnd].type === 'plain_text');
         joinEnd += 1
       ) {
-        joinArr.push(filtered[joinEnd]);
+        joinArr.push(
+          typeof filtered[joinEnd].text === 'string'
+            ? filtered[joinEnd].text
+            : filtered[joinEnd]
+        );
       }
 
       const text = joinArr.join('');

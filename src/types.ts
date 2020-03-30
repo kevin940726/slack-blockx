@@ -31,56 +31,50 @@ import {
   InputBlock,
 } from '@slack/types';
 
-export type Intrinsic<P> = Omit<P, 'type'> & {
-  action_id?: string;
-  block_id?: string;
-};
+export type Intrinsic<P> = Omit<P, 'type'>;
 export type IntrinsicChildren<P, K extends keyof P> = Omit<Intrinsic<P>, K> & {
+  K?: P[K];
   children?: P[K] | Children;
 };
 
-export type Child =
-  | { [key: string]: any }
-  | string
-  | number
-  | null
-  | false
-  | undefined;
+export type NonBlockChild = string | number | null | false | undefined;
+
+export type Child = { [key: string]: unknown } | NonBlockChild;
 export type Children = Child | Child[];
 
-export const MESSAGE_LAYOUT_BLOCKS = new Set([
+export const MESSAGE_LAYOUT_BLOCKS = [
   'actions',
   'context',
   'divider',
   'file',
   'image',
   'section',
-]);
+] as const;
 
-export const MODAL_LAYOUT_BLOCKS = new Set([
+export const MODAL_LAYOUT_BLOCKS = [
   'actions',
   'context',
   'divider',
   'image',
   'section',
-]);
+] as const;
 
-export const HOME_LAYOUT_BLOCKS = new Set([
+export const HOME_LAYOUT_BLOCKS = [
   'actions',
   'context',
   'divider',
   'image',
   'input',
   'section',
-]);
+] as const;
 
 declare global {
   namespace JSX {
     export type Element = Child;
     export interface IntrinsicElements {
-      blocks: Intrinsic<{
+      blocks: {
         [key: string]: any;
-      }>;
+      };
       dialog: IntrinsicChildren<Dialog, 'elements'>;
       modal:
         | IntrinsicChildren<View, 'blocks'>
@@ -126,6 +120,34 @@ declare global {
           };
       fragment: {};
       br: {};
+      b: {};
+      i: {};
+      s: {};
+      blockquote: {};
+      code: {};
+      pre: {};
+      link: { url: string };
+      a: { href: string };
+      emoji: {};
+      channel: {};
+      mention: {};
+      time: {
+        datetime: string | number | Date;
+        format:
+          | string
+          | ((tokens: {
+              date_num: string;
+              date: string;
+              date_short: string;
+              date_long: string;
+              date_pretty: string;
+              date_short_pretty: string;
+              date_long_pretty: string;
+              time: string;
+              time_secs: string;
+            }) => string);
+        link?: string;
+      };
     }
   }
 }

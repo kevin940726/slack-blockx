@@ -9,13 +9,11 @@ import {
 
 export function throwIfInvalidParentError(
   parentType: string,
-  expected: Set<string>,
+  expected: readonly string[],
   child: { type: string; [key: string]: any }
 ) {
-  if (!expected.has(child.type)) {
-    const joined = `${[...expected]
-      .map((type) => green(`<${type}>`))
-      .join(', ')}`;
+  if (!expected.includes(child.type)) {
+    const joined = `${expected.map((type) => green(`<${type}>`)).join(', ')}`;
 
     const parentLabel = green(`<${parentType}>`);
     const childLabel = green(`<${child.type}>`);

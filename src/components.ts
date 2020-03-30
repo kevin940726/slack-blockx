@@ -76,8 +76,8 @@ export const modal = ({
   title: stringToPlainText(title),
   submit: submit == null ? submit : stringToPlainText(submit),
   close: close == null ? close : stringToPlainText(close),
-  ...props,
   blocks: children,
+  ...props,
 });
 
 export const home = (props: Parameters<typeof modal>[0]): View => ({
@@ -168,3 +168,127 @@ export const dialog = ({
 });
 
 export const br = (): string => '\n';
+
+export const b = ({ children }: { children: string[] }): string[] => [
+  '*',
+  ...children,
+  '*',
+];
+
+export const i = ({ children }: { children: string[] }): string[] => [
+  '_',
+  ...children,
+  '_',
+];
+
+export const s = ({ children }: { children: string[] }): string[] => [
+  '~',
+  ...children,
+  '~',
+];
+
+export const blockquote = ({ children }: { children: string[] }): string[] => [
+  '>',
+  ...children,
+];
+
+export const code = ({ children }: { children: string[] }): string[] => [
+  '`',
+  ...children,
+  '`',
+];
+
+export const pre = ({ children }: { children: string[] }): string[] => [
+  '```',
+  ...children,
+  '```',
+];
+
+export const link = ({
+  url,
+  children,
+}: {
+  url: string;
+  children: string[];
+}): string[] => ['<', url, '|', ...children, '>'];
+// Alias
+export const a = ({
+  href,
+  children,
+}: {
+  href: string;
+  children: string[];
+}): string[] => link({ url: href, children });
+
+export const emoji = ({ children }: { children: string[] }): string =>
+  `:${children.join('')}:`;
+
+export const channel = ({ children }: { children: string[] }): string =>
+  `<#${children.join('')}>`;
+
+export const mention = ({ children }: { children: string[] }): string => {
+  const id = children.join('');
+
+  if (id.startsWith('U') || id.startsWith('W')) {
+    return `<@${id}>`;
+  } else if (id === 'here') {
+    return `<!here|here>`;
+  } else if (id === 'channel' || id === 'everyone') {
+    return `<!${id}>`;
+  } else {
+    return `<!subteam^${id}>`;
+  }
+};
+
+export const time = ({
+  datetime,
+  format,
+  link,
+  children,
+}: {
+  datetime: string | number | Date;
+  format:
+    | string
+    | ((tokens: {
+        date_num: string;
+        date: string;
+        date_short: string;
+        date_long: string;
+        date_pretty: string;
+        date_short_pretty: string;
+        date_long_pretty: string;
+        time: string;
+        time_secs: string;
+      }) => string);
+  link?: string;
+  children: string[];
+}): string => {
+  const isTimestamp =
+    typeof datetime === 'number' ||
+    (typeof datetime === 'string' && !isNaN(parseInt(datetime, 10)));
+  const timestamp = isTimestamp
+    ? parseInt(String(datetime), 10)
+    : new Date(datetime).getTime();
+
+  let token = format;
+  if (typeof format === 'function') {
+    token = format({
+      date_num: '{date_num}',
+      date: '{date}',
+      date_short: '{date_short}',
+      date_long: '{date_long}',
+      date_pretty: '{date_pretty}',
+      date_short_pretty: '{date_short_pretty}',
+      date_long_pretty: '{date_long_pretty}',
+      time: '{time}',
+      time_secs: '{time_secs}',
+    });
+  }
+
+  const optionalLink = link ? `^${link}` : '';
+
+  const fallback = children.join('');
+  const fallbackText = fallback || new Date(timestamp).toLocaleString();
+
+  return `<!date^${timestamp}^${token}${optionalLink}|${fallbackText}>`;
+};

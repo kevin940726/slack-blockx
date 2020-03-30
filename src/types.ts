@@ -31,16 +31,18 @@ import {
   InputBlock,
 } from '@slack/types';
 
-export type Intrinsic<P> = Omit<P, 'type'>;
+export type Intrinsic<P> = Omit<P, 'type'> & {
+  children?: Children;
+};
 export type IntrinsicChildren<P, K extends keyof P> = Omit<Intrinsic<P>, K> & {
   K?: P[K];
-  children?: P[K] | Children;
+  children: Children;
 };
 
 export type NonBlockChild = string | number | null | false | undefined;
 
 export type Child = { [key: string]: unknown } | NonBlockChild;
-export type Children = Child | Child[];
+export type Children = {} | {}[];
 
 export type Component<P extends {}> = (props: P) => JSX.Element | JSX.Element[];
 
@@ -73,6 +75,9 @@ export const HOME_LAYOUT_BLOCKS = [
 declare global {
   namespace JSX {
     export type Element = Child;
+    export interface ElementChildrenAttribute {
+      children: Children;
+    }
     export interface IntrinsicElements {
       blocks: {
         [key: string]: unknown;
@@ -111,8 +116,8 @@ declare global {
       context: IntrinsicChildren<ContextBlock, 'elements'>;
       actions: IntrinsicChildren<ActionsBlock, 'elements'>;
       divider: Intrinsic<DividerBlock>;
-      section: Intrinsic<SectionBlock> & {
-        children?: JSX.Element | [JSX.Element, JSX.Element];
+      section: Omit<Intrinsic<SectionBlock>, 'fields'> & {
+        fields?: SectionBlock['fields'] | JSX.Element | JSX.Element[];
       };
       file: Intrinsic<FileBlock>;
       input:
@@ -128,7 +133,7 @@ declare global {
       blockquote: {};
       code: {};
       pre: {};
-      link: { url: string };
+      link: { url: string; children: Children };
       a: { href: string };
       emoji: {};
       channel: {};

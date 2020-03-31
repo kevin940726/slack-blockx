@@ -222,15 +222,23 @@ export const a = ({
   children: string[];
 }): string[] => link({ url: href, children });
 
-export const emoji = ({ children }: { children: string[] }): string =>
-  `:${children.join('')}:`;
+export const emoji = ({
+  children: [{ text }],
+}: {
+  children: [PlainTextElement];
+}): string => `:${text}:`;
 
-export const channel = ({ children }: { children: string[] }): string =>
-  `<#${children.join('')}>`;
+export const channel = ({
+  children: [{ text }],
+}: {
+  children: [PlainTextElement];
+}): string => `<#${text}>`;
 
-export const mention = ({ children }: { children: string[] }): string => {
-  const id = children.join('');
-
+export const mention = ({
+  children: [{ text: id }],
+}: {
+  children: [PlainTextElement];
+}): string => {
   if (id.startsWith('U') || id.startsWith('W')) {
     return `<@${id}>`;
   } else if (id === 'here') {
@@ -246,7 +254,7 @@ export const time = ({
   datetime,
   format,
   link,
-  children,
+  children: [plainText],
 }: {
   datetime: string | number | Date;
   format:
@@ -263,8 +271,8 @@ export const time = ({
         time_secs: string;
       }) => string);
   link?: string;
-  children: string[];
-}): string => {
+  children: [PlainTextElement?];
+}): [string] => {
   const isTimestamp =
     typeof datetime === 'number' ||
     (typeof datetime === 'string' && !isNaN(parseInt(datetime, 10)));
@@ -289,8 +297,9 @@ export const time = ({
 
   const optionalLink = link ? `^${link}` : '';
 
-  const fallback = children.join('');
-  const fallbackText = fallback || new Date(timestamp).toLocaleString();
+  const fallbackText = plainText
+    ? plainText.text
+    : new Date(timestamp).toLocaleString();
 
-  return `<!date^${timestamp}^${token}${optionalLink}|${fallbackText}>`;
+  return [`<!date^${timestamp}^${token}${optionalLink}|${fallbackText}>`];
 };

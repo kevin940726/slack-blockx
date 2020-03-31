@@ -31,8 +31,13 @@ import {
   InputBlock,
 } from '@slack/types';
 
-export type Intrinsic<P> = Omit<P, 'type'> & {
+export type Intrinsic<P> = Omit<
+  Omit<Omit<P, 'type'>, 'placeholder'>,
+  'label'
+> & {
   children?: Children;
+  placeholder?: PlainTextElement | string | number;
+  label?: PlainTextElement | string | number;
 };
 export type IntrinsicChildren<P, K extends keyof P> = Omit<Intrinsic<P>, K> & {
   K?: P[K];
@@ -134,7 +139,7 @@ declare global {
       code: {};
       pre: {};
       link: { url: string; children: Children };
-      a: { href: string };
+      a: { href: string; children: Children };
       emoji: {};
       channel: {};
       mention: {};

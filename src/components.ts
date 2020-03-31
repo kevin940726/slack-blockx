@@ -13,8 +13,9 @@ import type {
   StaticSelect,
   MultiStaticSelect,
   Overflow,
+  PlainTextElement,
 } from '@slack/types';
-import { stringToPlainText } from './utils';
+import { stringToTextBlock } from './utils';
 
 export const blocks = ({
   children,
@@ -73,9 +74,10 @@ export const modal = ({
   close: View['close'] | string;
 }): View => ({
   type: 'modal',
-  title: stringToPlainText(title),
-  submit: submit == null ? submit : stringToPlainText(submit),
-  close: close == null ? close : stringToPlainText(close),
+  title: stringToTextBlock(title) as PlainTextElement,
+  submit:
+    submit == null ? submit : (stringToTextBlock(submit) as PlainTextElement),
+  close: close == null ? close : (stringToTextBlock(close) as PlainTextElement),
   blocks: children,
   ...props,
 });

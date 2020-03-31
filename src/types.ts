@@ -74,7 +74,7 @@ export const HOME_LAYOUT_BLOCKS = [
 
 declare global {
   namespace JSX {
-    export type Element = Child;
+    export type Element = Exclude<Exclude<Child, undefined>, null>;
     export interface ElementChildrenAttribute {
       children: Children;
     }

@@ -1,6 +1,11 @@
-import { PlainTextElement } from '@slack/types';
+import { PlainTextElement, MrkdwnElement } from '@slack/types';
 import * as predefinedComponents from './components';
-import { stringToPlainText, flattenChildren, createCleanError } from './utils';
+import {
+  stringToTextBlock,
+  flattenChildren,
+  createCleanError,
+  isTextBlock,
+} from './utils';
 import { validateParent } from './validators';
 import { Component } from './types';
 
@@ -23,34 +28,38 @@ function createBlock<P extends { [key: string]: unknown }>(
   }
 
   const props: P & {
-    text?: string | PlainTextElement;
+    text?: string | PlainTextElement | MrkdwnElement;
     placeholder?: string | number | PlainTextElement;
     label?: string | number | PlainTextElement;
   } = inputProps || {};
 
   if (typeof type === 'string') {
-    if (
-      flattenedChildren.length === 1 &&
-      flattenedChildren.every((child) => child.type === 'plain_text')
-    ) {
-      let text: string | PlainTextElement = flattenedChildren
-        .map((child) => child.text)
-        .join('');
+    if (flattenedChildren.length === 1 && isTextBlock(flattenedChildren[0])) {
+      let text = flattenedChildren[0].text as
+        | string
+        | PlainTextElement
+        | MrkdwnElement;
 
-      if (!['mrkdwn', 'markdown', 'plain_text'].includes(type)) {
-        text = stringToPlainText(text);
+      if (typeof text === 'string') {
+        text = stringToTextBlock(text) as PlainTextElement;
       }
 
-      props.text = text;
+      const textBlock: PlainTextElement | MrkdwnElement = text;
+
+      if (type !== 'plain_text' && type !== 'mrkdwn') {
+        props.text = textBlock;
+      } else {
+        props.text = textBlock.text;
+      }
     }
   }
 
   // Common prop name for plain_text field
   (['placeholder', 'label'] as const).forEach((textProp) => {
     if (textProp in props) {
-      props[textProp] = stringToPlainText(
+      props[textProp] = stringToTextBlock(
         props[textProp] as PlainTextElement | string | number
-      );
+      ) as PlainTextElement;
     }
   });
 

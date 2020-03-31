@@ -1,19 +1,59 @@
-import { PlainTextElement } from '@slack/types';
+import { PlainTextElement, MrkdwnElement } from '@slack/types';
 
-export function stringToPlainText(
-  text: PlainTextElement | string | number
-): PlainTextElement {
+export function stringToTextBlock(
+  text: PlainTextElement | MrkdwnElement | string | number,
+  forceType: string = 'plain_text'
+): PlainTextElement | MrkdwnElement {
   return typeof text === 'string' || typeof text === 'number'
-    ? {
-        type: 'plain_text',
-        emoji: true,
-        text: String(text),
-      }
+    ? forceType === 'plain_text'
+      ? {
+          type: 'plain_text',
+          emoji: true,
+          text: String(text),
+        }
+      : {
+          type: 'mrkdwn',
+          text: String(text),
+        }
     : text;
 }
 
 export function isNullish(value: unknown): boolean {
   return value == null || value === false;
+}
+
+export function isTextBlock(block: { type?: string }): boolean {
+  return (
+    block.type === 'plain_text' ||
+    block.type === 'mrkdwn' ||
+    block.type === 'markdown'
+  );
+}
+
+export function isText(element: unknown): boolean {
+  if (typeof element === 'string' || typeof element === 'number') {
+    return true;
+  }
+
+  if (typeof element === 'object' && element != null) {
+    return isTextBlock(element);
+  }
+
+  return false;
+}
+
+export function getTextElementType(
+  element: string | number | PlainTextElement | MrkdwnElement
+): 'plain_text' | 'mrkdwn' {
+  if (
+    typeof element === 'string' ||
+    typeof element === 'number' ||
+    element.type === 'plain_text'
+  ) {
+    return 'plain_text';
+  }
+
+  return 'mrkdwn';
 }
 
 export function flattenChildren(
@@ -27,27 +67,29 @@ export function flattenChildren(
   const filtered = flattened.filter((child) => !isNullish(child));
 
   for (let i = 0; i < filtered.length; i += 1) {
-    if (typeof filtered[i] !== 'object' || filtered[i].type === 'plain_text') {
-      let joinArr = [
-        typeof filtered[i].text === 'string' ? filtered[i].text : filtered[i],
-      ];
+    const element = filtered[i];
 
-      for (
-        let joinEnd = i + 1;
+    if (isText(element)) {
+      const elementType = getTextElementType(element);
+      let joinArr = [isTextBlock(element) ? element.text : element];
+
+      let joinEnd = i + 1;
+      let nextElement = filtered[joinEnd];
+      while (
         joinEnd < filtered.length &&
-        (typeof filtered[joinEnd] !== 'object' ||
-          filtered[joinEnd].type === 'plain_text');
-        joinEnd += 1
+        isText(nextElement) &&
+        (getTextElementType(nextElement) === elementType ||
+          // <br /> can both be plain_text and mrkdwn
+          nextElement.text === '\n')
       ) {
-        joinArr.push(
-          typeof filtered[joinEnd].text === 'string'
-            ? filtered[joinEnd].text
-            : filtered[joinEnd]
-        );
+        joinArr.push(isTextBlock(nextElement) ? nextElement.text : nextElement);
+
+        joinEnd += 1;
+        nextElement = filtered[joinEnd];
       }
 
       const text = joinArr.join('');
-      filtered.splice(i, joinArr.length, stringToPlainText(text));
+      filtered.splice(i, joinArr.length, stringToTextBlock(text, elementType));
     }
   }
 

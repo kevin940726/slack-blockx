@@ -1,5 +1,6 @@
 import htm from 'htm';
 import createBlock from './createBlock';
+import fromJSON from './fromJSON';
 
 const jsx = htm.bind(createBlock);
 
@@ -11,4 +12,5 @@ export {
   createBlock as createElement,
   jsx,
   jsx as html,
+  fromJSON,
 };

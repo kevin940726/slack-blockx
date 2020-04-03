@@ -8,6 +8,7 @@
   "author": "Kai Hao",
   "license": "MIT",
   "scripts": {
+    "prebuild": "rm -rf dist",
     "build": "tsc",
     "test": "jest"
   },

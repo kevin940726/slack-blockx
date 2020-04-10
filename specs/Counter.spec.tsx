@@ -1,8 +1,8 @@
 import { createBlock } from '../';
 
-function Counter({ count = 0, ...props }: { count?: number }) {
+function Counter({ count = 0 }: { count?: number }) {
   return (
-    <blocks {...props}>
+    <blocks>
       <section>
         <mrkdwn>
           You have clicked the button <code>{count}</code>{' '}
@@ -16,26 +16,24 @@ function Counter({ count = 0, ...props }: { count?: number }) {
 }
 
 test('<Counter />', () => {
-  expect(<Counter />).toMatchInlineSnapshot(`
-    Object {
-      "blocks": Array [
-        Object {
-          "accessory": Object {
-            "text": Object {
-              "emoji": true,
-              "text": "Button",
-              "type": "plain_text",
-            },
-            "type": "button",
-            "value": "0",
-          },
-          "text": Object {
-            "text": "You have clicked the button \`0\` times.",
-            "type": "mrkdwn",
-          },
-          "type": "section",
+  expect(<Counter />).toEqual({
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: 'You have clicked the button `0` times.',
         },
-      ],
-    }
-  `);
+        accessory: {
+          type: 'button',
+          value: '0',
+          text: {
+            type: 'plain_text',
+            emoji: true,
+            text: 'Button',
+          },
+        },
+      },
+    ],
+  });
 });

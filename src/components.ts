@@ -190,8 +190,8 @@ export const s = ({ children }: { children: string[] }): string[] => [
 ];
 
 export const blockquote = ({ children }: { children: string[] }): string[] => [
+  '>',
   ...children,
-  '\n',
 ];
 
 export const code = ({ children }: { children: string[] }): string[] => [
@@ -203,7 +203,7 @@ export const code = ({ children }: { children: string[] }): string[] => [
 export const pre = ({ children }: { children: string[] }): string[] => [
   '```',
   ...children,
-  '```\n',
+  '```',
 ];
 
 export const link = ({

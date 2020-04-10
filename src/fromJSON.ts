@@ -188,7 +188,7 @@ function fromJSON(
     }
     case 'context':
     case 'actions': {
-      const { elements, rest } = props;
+      const { elements, ...rest } = props;
       return {
         type,
         props: rest,
@@ -236,13 +236,19 @@ function fromJSON(
   }
 }
 
-export function fromText({
-  type,
-  text,
-}: {
-  type: 'plain_text' | 'mrkdwn';
-  text: string;
-}): BlockExpression[] {
+export function fromText(
+  textBlock:
+    | {
+        type: 'plain_text' | 'mrkdwn';
+        text: string;
+      }
+    | undefined
+): BlockExpression[] {
+  if (!textBlock) {
+    return [];
+  }
+
+  const { type, text } = textBlock;
   const expressions = type === 'mrkdwn' ? fromMultilineMarkdown(text) : [text];
 
   return expressions

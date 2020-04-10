@@ -1,6 +1,6 @@
 {
   "name": "slack-blockx",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "jsx for Slack block-kit",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

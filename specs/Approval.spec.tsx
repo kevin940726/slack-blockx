@@ -2,11 +2,11 @@ import { createBlock, Children } from '../';
 
 function Field({ label, children }: { label: string; children: Children }) {
   return (
-    <mrkdwn>
+    <fragment>
       <b>{label}:</b>
       <br />
       {children}
-    </mrkdwn>
+    </fragment>
   );
 }
 
@@ -27,7 +27,9 @@ function Approval({
         fields={
           compact
             ? details.map(({ label, value }) => (
-                <Field label={label}>{value}</Field>
+                <mrkdwn>
+                  <Field label={label}>{value}</Field>
+                </mrkdwn>
               ))
             : undefined
         }

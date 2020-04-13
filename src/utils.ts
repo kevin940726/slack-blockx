@@ -1,9 +1,9 @@
 import { PlainTextElement, MrkdwnElement } from '@slack/types';
 
 export function stringToTextBlock(
-  text: PlainTextElement | MrkdwnElement | string | number,
+  text: PlainTextElement | MrkdwnElement | string | number | undefined,
   forceType: string = 'plain_text'
-): PlainTextElement | MrkdwnElement {
+): PlainTextElement | MrkdwnElement | undefined {
   return typeof text === 'string' || typeof text === 'number'
     ? forceType === 'plain_text'
       ? {
@@ -58,10 +58,13 @@ export function getTextElementType(
 
 export function flattenChildren(
   children: JSX.Element[]
-): {
-  type: string;
-  [key: string]: unknown;
-}[] {
+): (
+  | {
+      type: string;
+      [key: string]: unknown;
+    }
+  | string
+)[] {
   const flattened = children.flat(Infinity);
 
   const filtered = flattened.filter((child) => !isNullish(child));
@@ -70,26 +73,26 @@ export function flattenChildren(
     const element = filtered[i];
 
     if (isText(element)) {
+      let text = isTextBlock(element) ? element.text : String(element);
       const elementType = getTextElementType(element);
-      let joinArr = [isTextBlock(element) ? element.text : element];
 
       let joinEnd = i + 1;
       let nextElement = filtered[joinEnd];
       while (
         joinEnd < filtered.length &&
         isText(nextElement) &&
-        (getTextElementType(nextElement) === elementType ||
-          // <br /> can both be plain_text and mrkdwn
-          nextElement.text === '\n')
+        getTextElementType(nextElement) === elementType &&
+        elementType !== 'mrkdwn'
       ) {
-        joinArr.push(isTextBlock(nextElement) ? nextElement.text : nextElement);
+        text += isTextBlock(nextElement)
+          ? nextElement.text
+          : String(nextElement);
 
         joinEnd += 1;
         nextElement = filtered[joinEnd];
       }
 
-      const text = joinArr.join('');
-      filtered.splice(i, joinArr.length, stringToTextBlock(text, elementType));
+      filtered.splice(i, joinEnd - i, stringToTextBlock(text, elementType));
     }
   }
 

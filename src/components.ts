@@ -12,6 +12,16 @@ import type {
   Option,
   StaticSelect,
   MultiStaticSelect,
+  UsersSelect,
+  MultiUsersSelect,
+  ConversationsSelect,
+  MultiConversationsSelect,
+  ChannelsSelect,
+  MultiChannelsSelect,
+  ExternalSelect,
+  MultiExternalSelect,
+  Datepicker,
+  PlainTextInput,
   Overflow,
   PlainTextElement,
 } from '@slack/types';
@@ -89,12 +99,15 @@ export const home = (props: Parameters<typeof modal>[0]): View => ({
 
 export const input = ({
   children: [element],
+  label,
   ...props
 }: InputBlock & {
   children: [InputBlock['element']];
+  label: InputBlock['label'] | string;
 }): InputBlock => ({
   type: 'input',
   element,
+  label: stringToTextBlock(label) as PlainTextElement,
   ...props,
 });
 
@@ -132,12 +145,25 @@ export const option = ({
 
 export const static_select = ({
   children,
+  option_groups,
+  placeholder,
   ...props
 }: StaticSelect & {
   children: StaticSelect['options'];
+  option_groups?: StaticSelect['option_groups'] & {
+    label: PlainTextElement | string;
+  };
+  placeholder?: StaticSelect['placeholder'] | string;
 }): StaticSelect => ({
   type: 'static_select',
   options: children,
+  option_groups:
+    option_groups &&
+    option_groups.map((optionGroup) => ({
+      ...optionGroup,
+      label: stringToTextBlock(optionGroup.label) as PlainTextElement,
+    })),
+  placeholder: stringToTextBlock(placeholder) as PlainTextElement,
   ...props,
 });
 
@@ -146,6 +172,112 @@ export const multi_static_select = (
 ): MultiStaticSelect => ({
   ...static_select(props),
   type: 'multi_static_select',
+});
+
+export const users_select = ({
+  placeholder,
+  children,
+  ...props
+}: UsersSelect & {
+  placeholder?: UsersSelect['placeholder'] | string;
+  children: [];
+}): UsersSelect => ({
+  type: 'users_select',
+  placeholder: stringToTextBlock(placeholder) as PlainTextElement,
+  ...props,
+});
+
+export const multi_users_select = (
+  props: Parameters<typeof users_select>[0]
+): MultiUsersSelect => ({
+  ...users_select(props),
+  type: 'multi_users_select',
+});
+
+export const conversations_select = ({
+  placeholder,
+  children,
+  ...props
+}: ConversationsSelect & {
+  placeholder?: ConversationsSelect['placeholder'] | string;
+  children: [];
+}): ConversationsSelect => ({
+  type: 'conversations_select',
+  placeholder: stringToTextBlock(placeholder) as PlainTextElement,
+  ...props,
+});
+
+export const multi_conversations_select = (
+  props: Parameters<typeof conversations_select>[0]
+): MultiConversationsSelect => ({
+  ...conversations_select(props),
+  type: 'multi_conversations_select',
+});
+
+export const channels_select = ({
+  placeholder,
+  children,
+  ...props
+}: ChannelsSelect & {
+  placeholder?: ChannelsSelect['placeholder'] | string;
+  children: [];
+}): ChannelsSelect => ({
+  type: 'channels_select',
+  placeholder: stringToTextBlock(placeholder) as PlainTextElement,
+  ...props,
+});
+
+export const multi_channels_select = (
+  props: Parameters<typeof channels_select>[0]
+): MultiChannelsSelect => ({
+  ...channels_select(props),
+  type: 'multi_channels_select',
+});
+
+export const external_select = ({
+  placeholder,
+  children,
+  ...props
+}: ExternalSelect & {
+  placeholder?: ExternalSelect['placeholder'] | string;
+  children: [];
+}): ExternalSelect => ({
+  type: 'external_select',
+  placeholder: stringToTextBlock(placeholder) as PlainTextElement,
+  ...props,
+});
+
+export const multi_external_select = (
+  props: Parameters<typeof external_select>[0]
+): MultiExternalSelect => ({
+  ...external_select(props),
+  type: 'multi_external_select',
+});
+
+export const datepicker = ({
+  placeholder,
+  children,
+  ...props
+}: Datepicker & {
+  placeholder: Datepicker['placeholder'] | string;
+  children: [];
+}): Datepicker => ({
+  type: 'datepicker',
+  placeholder: stringToTextBlock(placeholder) as PlainTextElement,
+  ...props,
+});
+
+export const plain_text_input = ({
+  placeholder,
+  children,
+  ...props
+}: PlainTextInput & {
+  placeholder: PlainTextInput['placeholder'] | string;
+  children: [];
+}): PlainTextInput => ({
+  type: 'plain_text_input',
+  placeholder: stringToTextBlock(placeholder) as PlainTextElement,
+  ...props,
 });
 
 export const overflow = ({
